@@ -31,3 +31,6 @@ void LegalSpacesBoard::draw() {
 Tile& LegalSpacesBoard::getTile(int x, int y) {
     return grid[y][x]; // Access with y first for row-major order
 }
+
+LegalSpacesBoard::~LegalSpacesBoard() {
+}

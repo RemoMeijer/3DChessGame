@@ -15,17 +15,16 @@ public:
     LegalSpacesBoard(int rows, int cols, float tileSize);
     ~LegalSpacesBoard();
 
-    virtual void init() override;
-    virtual void draw() override;
+    void init() override;
+    void draw() override;
 
     Tile& getTile(int x, int y);
+
 private:
     int rows;
     int cols;
     float tileSize;
     std::vector<std::vector<Tile>> grid;
 };
-
-
 
 #endif //LEGALSPACESBOARD_H

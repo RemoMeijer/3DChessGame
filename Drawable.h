@@ -10,13 +10,10 @@ using tigl::Vertex;
 
 class Drawable {
 public:
-	std::vector<Vertex> vertices;
-
-public:
 	Drawable();
-
 	~Drawable();
 
+	std::vector<Vertex> vertices;
 	glm::vec3 position = glm::vec3(0, 0, 0);
 	glm::vec3 rotation = glm::vec3(0, 0, 0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);

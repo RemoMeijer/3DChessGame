@@ -1,20 +1,12 @@
 #include "Drawable.h"
 
-Drawable::Drawable()
-{
-}
+Drawable::Drawable() = default;
 
-Drawable::~Drawable()
-{
-}
+Drawable::~Drawable() = default;
 
-void Drawable::init()
-{
-}
+void Drawable::init(){ }
 
-void Drawable::update(float deltaTime)
-{
-}
+void Drawable::update(float deltaTime){ }
 
 void Drawable::draw()
 {

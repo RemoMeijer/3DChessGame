@@ -7,7 +7,6 @@
 class Texture;
 
 class Board : public Drawable {
-private:
 	Texture *texture;
 
 public:
@@ -15,9 +14,8 @@ public:
 
 	~Board();
 
-	virtual void init() override;
-
-	virtual void draw() override;
+	void init() override;
+	void draw() override;
 };
 
 #endif

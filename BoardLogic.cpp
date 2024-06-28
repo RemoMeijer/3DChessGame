@@ -4,14 +4,22 @@
 
 #include "BoardLogic.h"
 
+#include "Pieces/Bishop.h"
+#include "Pieces/King.h"
+#include "Pieces/Knight.h"
+#include "Pieces/Pawn.h"
+#include "Pieces/Queen.h"
+#include "Pieces/Rook.h"
+
 
 BoardLogic::BoardLogic() {
-    singlePlayer = false;
-    whiteTurn = true; // White to start
-    turnChanged = false;
-    selectedPiece = nullptr;
+    singlePlayer = false;   // Bot on or off
+    whiteTurn = true;       // White to start
+    turnChanged = false;    // Switch camera, or make the bot move
+    selectedPiece = nullptr; // Piece that is picked-up
     currentState = SELECTING; // Start the game in the selecting state
-    srand(time(nullptr));
+    srand(time(nullptr)); // Seeding for some random moves
+    botMoveCounter = 0;
 }
 
 void BoardLogic::AddPiece(Piece *piece) {
@@ -26,7 +34,7 @@ void BoardLogic::changeTurn() {
 void BoardLogic::playSound(const std::string &filePath) {
     if (!buffer.loadFromFile(filePath)) {
         std::cout << "Failed to load sound!" << std::endl;
-        return;
+        return; // No need to crash, just skip playing sound
     }
 
     sound.setBuffer(buffer);
@@ -110,6 +118,7 @@ void BoardLogic::makeMove(int x, int y) {
     }) != captureTiles.end()) {
         selectedPiece->moveTo(glm::ivec2(x, y));
 
+        // Check if capture, to prevent playing two sound trough each other
         if(!capture) {
             playSound("Resources/Sounds/move-self.wav");
         }
@@ -118,6 +127,8 @@ void BoardLogic::makeMove(int x, int y) {
         changeTurn();
         return;
     }
+
+    // De-select piece if no move made
     selectedPiece->isNotPicked();
 }
 
@@ -132,39 +143,47 @@ void BoardLogic::selectPiece(int x, int y) {
                 std::cout << "Not yer piece" << std::endl;
                 return;
             }
+
+            // Clear tiles of previous piece
             validTiles.clear();
             captureTiles.clear();
 
+            // Pick 'em up
             piece->isPicked();
 
             // We be movin now
             currentState = MOVING;
 
             switch (piece->pieceType) {
-                case PAWN:
-                    checkPawnMoves(piece);
+                case PAWN: checkPawnMoves(dynamic_cast<Pawn*>(piece));
                     break;
-                case ROOK: checkRookMoves(piece);
+                case ROOK: checkRookMoves(dynamic_cast<Rook*>(piece));
                     break;
-                case QUEEN: checkQueenMoves(piece);
+                case QUEEN: checkQueenMoves(dynamic_cast<Queen*>(piece));
                     break;
-                case BISHOP: checkBishopMoves(piece);
+                case BISHOP: checkBishopMoves(dynamic_cast<Bishop*>(piece));
                     break;
-                case KNIGHT: checkKnightMoves(piece);
+                case KNIGHT: checkKnightMoves(dynamic_cast<Knight*>(piece));
                     break;
-                case KING: checkKingMoves(piece);
+                case KING: checkKingMoves(dynamic_cast<King*>(piece));
                     break;
                 default:
                     std::cout << "Invalid piece found." << std::endl;
                     break;
             }
+
+            // Check check -> allow only moves if the piece can block check or capture the piece giving the check
             filterLegalMoves(selectedPiece);
         }
     }
 }
 
-void BoardLogic::checkPawnMoves(Piece *checkedPiece) {
+void BoardLogic::checkPawnMoves(Pawn *checkedPiece) {
     auto addMoveIfValid = [&](int x, int y) {
+        // Board boundaries
+        if (y < 0 || y > 7) {
+            return;
+        }
         // Check if the tile is not occupied by any piece
         if (std::none_of(boardState.begin(), boardState.end(), [&](Piece *piece) {
             return piece->gridPosition == glm::ivec2(x, y);
@@ -212,7 +231,7 @@ void BoardLogic::checkPawnMoves(Piece *checkedPiece) {
 }
 
 // Check valid pawn moves
-void BoardLogic::checkBishopMoves(Piece *checkedPiece) {
+void BoardLogic::checkBishopMoves(Bishop *checkedPiece) {
     validTiles.clear();
     captureTiles.clear();
 
@@ -223,7 +242,7 @@ void BoardLogic::checkBishopMoves(Piece *checkedPiece) {
     checkDirection(checkedPiece, -1, -1); // Down-Left
 }
 
-void BoardLogic::checkKnightMoves(Piece *checkedPiece) {
+void BoardLogic::checkKnightMoves(Knight *checkedPiece) {
     validTiles.clear(); // Empty out valid tiles
     captureTiles.clear(); // Empty out capture tiles
 
@@ -256,7 +275,7 @@ void BoardLogic::checkKnightMoves(Piece *checkedPiece) {
     }
 }
 
-void  BoardLogic::checkRookMoves(Piece *checkedPiece) {
+void  BoardLogic::checkRookMoves(Rook  *checkedPiece) {
     validTiles.clear(); // Empty out valid tiles
     captureTiles.clear(); // Empty out capture tiles
 
@@ -267,7 +286,7 @@ void  BoardLogic::checkRookMoves(Piece *checkedPiece) {
     checkDirection(checkedPiece, 0, -1); // Down
 }
 
-void  BoardLogic::checkQueenMoves(Piece *checkedPiece) {
+void  BoardLogic::checkQueenMoves(Queen *checkedPiece) {
     validTiles.clear(); // Empty out valid tiles
     captureTiles.clear(); // Empty out capture tiles
 
@@ -282,7 +301,7 @@ void  BoardLogic::checkQueenMoves(Piece *checkedPiece) {
     checkDirection(checkedPiece, -1, -1); // Down-Left
 }
 
-void BoardLogic::checkKingMoves(Piece *checkedPiece) {
+void BoardLogic::checkKingMoves(King *checkedPiece) {
     validTiles.clear(); // Empty out valid tiles
     captureTiles.clear(); // Empty out capture tiles
 
@@ -325,28 +344,28 @@ Piece *BoardLogic::findKing(PieceColor pieceColor) {
 }
 
 
-bool BoardLogic::isKingInCheck(Piece *king) {
+bool BoardLogic::isKingInCheck(King* king) {
     for (Piece *piece: boardState) {
         if (piece->pieceColor != king->pieceColor) {
 
             switch (piece->pieceType) {
                 case PAWN:
-                    getPawnCaptureMoves(piece);
+                    getPawnCaptureMoves(dynamic_cast<Pawn*>(piece));
                     break;
                 case ROOK:
-                    getRookCaptureMoves(piece);
+                    getRookCaptureMoves(dynamic_cast<Rook*>(piece));
                     break;
                 case QUEEN:
-                    getQueenCaptureMoves(piece);
+                    getQueenCaptureMoves(dynamic_cast<Queen*>(piece));
                     break;
                 case BISHOP:
-                    getBishopCaptureMoves(piece);
+                    getBishopCaptureMoves(dynamic_cast<Bishop*>(piece));
                     break;
                 case KNIGHT:
-                    getKnightCaptureMoves(piece);
+                    getKnightCaptureMoves(dynamic_cast<Knight*>(piece));
                     break;
                 case KING:
-                    getKingCaptureMoves(piece);
+                    getKingCaptureMoves(dynamic_cast<King*>(piece));
                     break;
             }
             for (const auto &tile: potentialCaptureTiles) {
@@ -398,7 +417,7 @@ bool BoardLogic::isKingInCheckAfterMove(Piece *piece, const glm::ivec2 &newPos) 
 
     // Check if the king is in check after the move
     Piece* king = findKing(piece->pieceColor);
-    bool inCheck = isKingInCheck(king);
+    bool inCheck = isKingInCheck(dynamic_cast<King*>(king));
 
     // Revert the piece to its original position
     piece->gridPosition = originalPos;
@@ -411,7 +430,7 @@ bool BoardLogic::isKingInCheckAfterMove(Piece *piece, const glm::ivec2 &newPos) 
     return inCheck;
 }
 
-void BoardLogic::getPawnCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getPawnCaptureMoves(Pawn* checkedPiece) {
     potentialCaptureTiles.clear(); // Empty out potential capture tiles
 
     int direction = (checkedPiece->pieceColor == BLACK) ? 1 : -1;
@@ -427,7 +446,7 @@ void BoardLogic::getPawnCaptureMoves(Piece* checkedPiece) {
     addCaptureIfValid(checkedPiece->gridPosition.x + 1, checkedPiece->gridPosition.y + direction);
 }
 
-void BoardLogic::getRookCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getRookCaptureMoves(Rook* checkedPiece) {
     potentialCaptureTiles.clear();
 
     auto checkDirection = [&](int dx, int dy) {
@@ -456,7 +475,7 @@ void BoardLogic::getRookCaptureMoves(Piece* checkedPiece) {
     checkDirection(0, -1); // Down
 }
 
-void BoardLogic::getQueenCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getQueenCaptureMoves(Queen* checkedPiece) {
     potentialCaptureTiles.clear();
 
     auto checkDirection = [&](int dx, int dy) {
@@ -489,7 +508,7 @@ void BoardLogic::getQueenCaptureMoves(Piece* checkedPiece) {
     checkDirection(-1, -1); // Down-Left
 }
 
-void BoardLogic::getBishopCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getBishopCaptureMoves(Bishop* checkedPiece) {
     potentialCaptureTiles.clear();
 
     auto checkDirection = [&](int dx, int dy) {
@@ -518,7 +537,7 @@ void BoardLogic::getBishopCaptureMoves(Piece* checkedPiece) {
     checkDirection(-1, -1); // Down-Left
 }
 
-void BoardLogic::getKnightCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getKnightCaptureMoves(Knight* checkedPiece) {
     potentialCaptureTiles.clear();
 
     auto addCaptureIfValid = [&](int x, int y) {
@@ -541,7 +560,7 @@ void BoardLogic::getKnightCaptureMoves(Piece* checkedPiece) {
     }
 }
 
-void BoardLogic::getKingCaptureMoves(Piece* checkedPiece) {
+void BoardLogic::getKingCaptureMoves(King* checkedPiece) {
     potentialCaptureTiles.clear();
 
     auto addCaptureIfValid = [&](int x, int y) {
@@ -575,6 +594,10 @@ std::vector<Piece*> BoardLogic::getBotPieces(PieceColor color) {
 }
 
 void BoardLogic::selectRandomMove(Piece* piece) {
+    if (botMoveCounter >= 20) {
+        std::cout << "Move limit reached. No legal bot moves available." << std::endl;
+        return;
+    }
     // Clear the valid and capture tiles
     validTiles.clear();
     captureTiles.clear();
@@ -583,12 +606,12 @@ void BoardLogic::selectRandomMove(Piece* piece) {
 
     // Get valid moves for the piece
     switch (piece->pieceType) {
-        case PAWN: checkPawnMoves(selectedPiece); break;
-        case ROOK: checkRookMoves(selectedPiece); break;
-        case QUEEN: checkQueenMoves(selectedPiece); break;
-        case BISHOP: checkBishopMoves(selectedPiece); break;
-        case KNIGHT: checkKnightMoves(selectedPiece); break;
-        case KING: checkKingMoves(selectedPiece); break;
+        case PAWN: checkPawnMoves(dynamic_cast<Pawn*>(piece)); break;
+        case ROOK: checkRookMoves(dynamic_cast<Rook*>(piece)); break;
+        case QUEEN: checkQueenMoves(dynamic_cast<Queen*>(piece)); break;
+        case BISHOP: checkBishopMoves(dynamic_cast<Bishop*>(piece)); break;
+        case KNIGHT: checkKnightMoves(dynamic_cast<Knight*>(piece)); break;
+        case KING: checkKingMoves(dynamic_cast<King*>(piece)); break;
     }
 
     // Filter out illegal moves
@@ -603,8 +626,10 @@ void BoardLogic::selectRandomMove(Piece* piece) {
         int randomIndex = std::rand() % allMoves.size();
         glm::ivec2 move = allMoves[randomIndex];
         makeMove(move.x, move.y);
+        botMoveCounter = 0;
     } else {
         makeBotMove();
+        botMoveCounter += 1;
     }
 }
 
@@ -618,5 +643,7 @@ void BoardLogic::makeBotMove() {
         std::cout << randomIndex << std::endl;
         Piece* randomPiece = botPieces[randomIndex];
         selectRandomMove(randomPiece);
+    } else {
+        std::cout << "No bot pieces available, checkmate(?)" << std::endl;
     }
 }

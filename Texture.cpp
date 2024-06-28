@@ -3,18 +3,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture::Texture(const std::string& fileName)
-{
+Texture::Texture(const std::string &fileName) {
 	// Generate id and load the image data
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
 	int width, height, comp;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(fileName.c_str(), &width, &height, &comp, 4);
-	
+	unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &comp, 4);
+
 	// Check if loading was succesful
-	if (!data)
-	{
+	if (!data) {
 		printf("%s -> %s\n", fileName.c_str(), stbi_failure_reason());
 		exit(0);
 	}
@@ -33,7 +31,6 @@ Texture::Texture(const std::string& fileName)
 	stbi_image_free(data);
 }
 
-void Texture::bind()
-{
+void Texture::bind() {
 	glBindTexture(GL_TEXTURE_2D, id);
 }

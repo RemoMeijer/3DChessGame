@@ -52,7 +52,7 @@ void Graphics::init() {
     glfwSetMouseButtonCallback(window, Graphics::handleMouseCallback);
 
     // Create board
-    auto *board = new Board(new Texture("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/chessboard.png"));
+    auto *board = new Board(new Texture("Resources/chessboard.png"));
     board->position = glm::vec3(7.28f, 0, 5.0f);
     board->scale = glm::vec3(5);
     drawables.push_back(board);
