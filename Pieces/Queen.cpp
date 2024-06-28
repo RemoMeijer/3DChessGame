@@ -4,8 +4,8 @@
 
 #include "Queen.h"
 
-Queen::Queen(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType pieceType, PieceColor pieceColor)
-    : Piece(graphics, model, col, pos, glm::vec3(0.2f), pieceType, pieceColor) {
+Queen::Queen(Graphics *graphics, glm::ivec2 pos, PieceColor pieceColor)
+    : Piece(graphics, Piece::queenModel, pos, glm::vec3(0.2f), QUEEN, pieceColor) {
 }
 
 Queen::~Queen() {

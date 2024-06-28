@@ -31,3 +31,5 @@ add_executable(eindopdracht
         Tile.h
 )
 target_link_libraries(eindopdracht GLEW::GLEW glfw OpenGL::GL dl pthread X11 sfml-audio)
+
+file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${CMAKE_BINARY_DIR})

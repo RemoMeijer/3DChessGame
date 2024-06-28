@@ -104,9 +104,9 @@ float Camera::distanceToTarget(glm::vec3 origin, glm::vec3 target) {
 
     // Calculate the magnitude of the difference vector
     float distance = glm::sqrt(
-        glm::pow(diff.x, 2.0f) +
-        glm::pow(diff.y, 2.0f) +
-        glm::pow(diff.z, 2.0f)
+        glm::pow(diff.x, 2) +
+        glm::pow(diff.y, 2) +
+        glm::pow(diff.z, 2)
     );
     return distance;
 }

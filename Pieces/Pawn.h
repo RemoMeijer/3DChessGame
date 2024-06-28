@@ -11,7 +11,7 @@ class Graphics;
 
 class Pawn : public Piece{
 public:
-    Pawn(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType, PieceColor);
+    Pawn(Graphics *graphics, glm::ivec2 pos, PieceColor);
     ~Pawn();
 };
 

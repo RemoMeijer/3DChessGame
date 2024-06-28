@@ -9,7 +9,7 @@
 
 class Queen : public Piece {
 public:
-    Queen(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType, PieceColor);
+    Queen(Graphics *graphics, glm::ivec2 pos, PieceColor);
     ~Queen();
 };
 

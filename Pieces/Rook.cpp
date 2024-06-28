@@ -4,8 +4,8 @@
 
 #include "Rook.h"
 
-Rook::Rook(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType pieceType, PieceColor pieceColor)
-    : Piece(graphics, model, col, pos, glm::vec3(0.2f), pieceType, pieceColor) {
+Rook::Rook(Graphics *graphics, glm::ivec2 pos, PieceColor pieceColor)
+    : Piece(graphics, Piece::rookModel, pos, glm::vec3(0.2f), ROOK, pieceColor) {
 }
 
 Rook::~Rook() { }

@@ -10,7 +10,7 @@ class Graphics;
 
 class Knight : public Piece {
 public:
-    Knight(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType, PieceColor);
+    Knight(Graphics *graphics, glm::ivec2 pos, PieceColor);
     ~Knight();
 };
 

@@ -167,25 +167,18 @@ void Graphics::handleMouseCallback(GLFWwindow *window, int button, int action, i
 }
 
 void Graphics::createBoardPieces() {
-    auto *pawnModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Pawn/pawn.obj");
-    auto *rookModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Rook/rook.obj");
-    auto *knightModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Knight/knight.obj");
-    auto *bishopModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Bishop/bishop.obj");
-    auto *queenModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Queen/queen.obj");
-    auto *kingModel = new ObjModel("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/King/king.obj");
 
-    glm::vec4 blackPieceColor = glm::vec4(0.2078f, 0.2235, 0.2078f, 1);
-    glm::vec4 whitePieceColor = glm::vec4(1, 0.8921f, 0.6156f, 1);
+    Piece::loadModels();
 
     // Pawn
     for (int i = 0; i < 8; i++) {
         glm::ivec2 gridPosBlack(i, 1);
-        Piece *pawnBlack = new Pawn(this, pawnModel, blackPieceColor, gridPosBlack, PAWN, BLACK);
+        Piece *pawnBlack = new Pawn(this, gridPosBlack, BLACK);
         boardlogic->AddPiece(pawnBlack);
         drawables.push_back(pawnBlack);
 
         glm::ivec2 gridPosWhite(i, 6);
-        Piece *pawnWhite = new Pawn(this, pawnModel, whitePieceColor, gridPosWhite, PAWN, WHITE);
+        Piece *pawnWhite = new Pawn(this, gridPosWhite, WHITE);
         boardlogic->AddPiece(pawnWhite);
         drawables.push_back(pawnWhite);
     }
@@ -195,12 +188,12 @@ void Graphics::createBoardPieces() {
     int y = 0;
     for (int i = 0; i < 2; i++) {
         glm::ivec2 gridPos(y, 0);
-        Piece *rook = new Rook(this, rookModel, blackPieceColor, gridPos, ROOK, BLACK);
+        Piece *rook = new Rook(this, gridPos, BLACK);
         boardlogic->AddPiece(rook);
         drawables.push_back(rook);
 
         glm::ivec2 gridPosWhite(x, 7);
-        Piece *rookWhite = new Rook(this, rookModel, whitePieceColor, gridPosWhite, ROOK, WHITE);
+        Piece *rookWhite = new Rook(this, gridPosWhite, WHITE);
         boardlogic->AddPiece(rookWhite);
         drawables.push_back(rookWhite);
 
@@ -214,12 +207,12 @@ void Graphics::createBoardPieces() {
     y = 1;
     for (int i = 0; i < 2; i++) {
         glm::ivec2 gridPos(y, 0);
-        Piece *knight = new Knight(this, knightModel, blackPieceColor, gridPos, KNIGHT, BLACK);
+        Piece *knight = new Knight(this, gridPos, BLACK);
         boardlogic->AddPiece(knight);
         drawables.push_back(knight);
 
         glm::ivec2 gridPosWhite(x, 7);
-        Piece *knightWhite = new Knight(this, knightModel, whitePieceColor, gridPosWhite, KNIGHT, WHITE);
+        Piece *knightWhite = new Knight(this, gridPosWhite, WHITE);
         boardlogic->AddPiece(knightWhite);
         drawables.push_back(knightWhite);
 
@@ -233,12 +226,12 @@ void Graphics::createBoardPieces() {
     y = 2;
     for (int i = 0; i < 2; i++) {
         glm::ivec2 gridPos(y, 0);
-        Piece *bishop = new Bishop(this, bishopModel, blackPieceColor, gridPos, BISHOP, BLACK);
+        Piece *bishop = new Bishop(this, gridPos, BLACK);
         boardlogic->AddPiece(bishop);
         drawables.push_back(bishop);
 
         glm::ivec2 gridPosWhite(x, 7);
-        Piece *bishopWhite = new Bishop(this, bishopModel, whitePieceColor, gridPosWhite, BISHOP, WHITE);
+        Piece *bishopWhite = new Bishop(this, gridPosWhite, WHITE);
         boardlogic->AddPiece(bishopWhite);
         drawables.push_back(bishopWhite);
 
@@ -249,23 +242,23 @@ void Graphics::createBoardPieces() {
 
     // Queen
     glm::ivec2 gridPos(3, 0);
-    Piece *queen = new Queen(this, queenModel, blackPieceColor, gridPos, QUEEN, BLACK);
+    Piece *queen = new Queen(this, gridPos, BLACK);
     boardlogic->AddPiece(queen);
     drawables.push_back(queen);
 
     glm::ivec2 gridPos2(3, 7);
-    Piece *queen2 = new Queen(this, queenModel, whitePieceColor, gridPos2, QUEEN, WHITE);
+    Piece *queen2 = new Queen(this, gridPos2, WHITE);
     boardlogic->AddPiece(queen2);
     drawables.push_back(queen2);
 
     // King
     glm::ivec2 gridPos3(4, 0);
-    Piece *king = new King(this, kingModel, blackPieceColor, gridPos3, KING, BLACK);
+    Piece *king = new King(this, gridPos3, BLACK);
     boardlogic->AddPiece(king);
     drawables.push_back(king);
 
     glm::ivec2 gridPos4(4, 7);
-    Piece *king2 = new King(this, kingModel, whitePieceColor, gridPos4, KING, WHITE);
+    Piece *king2 = new King(this, gridPos4, WHITE);
     boardlogic->AddPiece(king2);
     drawables.push_back(king2);
 }

@@ -26,7 +26,15 @@ public:
     glm::ivec2 destination{};
     bool moveToTarget;
 
-    Piece(Graphics* graphics, ObjModel* model, glm::vec4 drawnCol, glm::ivec2 pos, glm::vec3 pieceScaling
+    static void loadModels();
+    static ObjModel *pawnModel;
+    static ObjModel *rookModel;
+    static ObjModel *knightModel;
+    static ObjModel *bishopModel;
+    static ObjModel *queenModel;
+    static ObjModel *kingModel;
+
+    Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos, glm::vec3 pieceScaling
         , PieceType pieceType, PieceColor pieceColor);
 
     void remove();

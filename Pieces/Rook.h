@@ -10,7 +10,7 @@
 
 class Rook : public Piece{
 public:
-    Rook(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType, PieceColor);
+    Rook(Graphics *graphics, glm::ivec2 pos, PieceColor);
     ~Rook();
 };
 

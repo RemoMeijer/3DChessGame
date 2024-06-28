@@ -92,7 +92,7 @@ void BoardLogic::makeMove(int x, int y) {
         // Find and move the captured piece
         for (Piece *piece: boardState) {
             if (piece->gridPosition == glm::ivec2(x, y)) {
-                playSound("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Sounds/capture.wav");
+                playSound("Resources/Sounds/capture.wav");
                 piece->captured(); // Move captured piece to the shadow realm
                 capture = true;
                 break;
@@ -111,7 +111,7 @@ void BoardLogic::makeMove(int x, int y) {
         selectedPiece->moveTo(glm::ivec2(x, y));
 
         if(!capture) {
-            playSound("/home/remo/CLionProjects/3DGraphics/eindopdracht/Resources/Sounds/move-self.wav");
+            playSound("Resources/Sounds/move-self.wav");
         }
 
         // Piece moved, other's turn!

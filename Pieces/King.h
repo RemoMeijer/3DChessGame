@@ -9,7 +9,7 @@
 
 class King : public Piece {
 public:
-    King(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType, PieceColor);
+    King(Graphics *graphics, glm::ivec2 pos, PieceColor);
     bool CheckIfCheck();
     ~King();
 };

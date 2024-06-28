@@ -4,8 +4,8 @@
 
 #include "Pawn.h"
 
-Pawn::Pawn(Graphics *graphics, ObjModel *model, glm::vec4 col, glm::ivec2 pos, PieceType pieceType, PieceColor pieceColor)
-    : Piece(graphics, model, col, pos, glm::vec3(0.2f), pieceType, pieceColor) {
+Pawn::Pawn(Graphics *graphics, glm::ivec2 pos, PieceColor pieceColor)
+    : Piece(graphics, Piece::pawnModel, pos, glm::vec3(0.2f), PAWN, pieceColor) {
 }
 
 
