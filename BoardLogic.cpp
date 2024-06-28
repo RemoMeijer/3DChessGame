@@ -4,22 +4,15 @@
 
 #include "BoardLogic.h"
 
-#include "Pieces/Bishop.h"
-#include "Pieces/King.h"
-#include "Pieces/Knight.h"
-#include "Pieces/Pawn.h"
-#include "Pieces/Queen.h"
-#include "Pieces/Rook.h"
-
-
 BoardLogic::BoardLogic() {
-    singlePlayer = false;   // Bot on or off
+    singlePlayer = true;   // Bot on or off -> todo make clickable in game
     whiteTurn = true;       // White to start
     turnChanged = false;    // Switch camera, or make the bot move
     selectedPiece = nullptr; // Piece that is picked-up
     currentState = SELECTING; // Start the game in the selecting state
     srand(time(nullptr)); // Seeding for some random moves
     botMoveCounter = 0;
+    gameEnded = false;
 }
 
 void BoardLogic::AddPiece(Piece *piece) {
@@ -46,6 +39,7 @@ bool BoardLogic::checkDirection(Piece *checkedPiece, int dx, int dy) {
     int x = checkedPiece->gridPosition.x + dx;
     int y = checkedPiece->gridPosition.y + dy;
 
+    // Keep within board
     while (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT) {
         // Check if the tile is occupied by an enemy piece
         auto it = std::find_if(boardState.begin(), boardState.end(), [&](Piece *piece) {
@@ -94,7 +88,7 @@ void BoardLogic::makeMove(int x, int y) {
         return tile.x == x && tile.y == y;
     });
 
-
+    // Check if capture
     bool capture = false;
     if (it != captureTiles.end()) {
         // Find and move the captured piece
@@ -348,6 +342,7 @@ bool BoardLogic::isKingInCheck(King* king) {
     for (Piece *piece: boardState) {
         if (piece->pieceColor != king->pieceColor) {
 
+            // Check all possible captures of each piece
             switch (piece->pieceType) {
                 case PAWN:
                     getPawnCaptureMoves(dynamic_cast<Pawn*>(piece));
@@ -368,6 +363,7 @@ bool BoardLogic::isKingInCheck(King* king) {
                     getKingCaptureMoves(dynamic_cast<King*>(piece));
                     break;
             }
+            // If the king is one of them, it's in check
             for (const auto &tile: potentialCaptureTiles) {
                 if (tile == king->gridPosition) {
                     return true;
@@ -379,7 +375,7 @@ bool BoardLogic::isKingInCheck(King* king) {
 }
 
 void BoardLogic::filterLegalMoves(Piece *piece) {
-    // Remove elements from validTiles based on condition
+    // Remove valid tiles that will discover check own king after moving
     validTiles.erase(
         std::remove_if(validTiles.begin(), validTiles.end(),
             [&](const glm::ivec2& tile) {
@@ -388,7 +384,7 @@ void BoardLogic::filterLegalMoves(Piece *piece) {
         validTiles.end()
     );
 
-    // Remove elements from validTiles based on condition
+    // Remove capture tiles that will discover check own king after capturing
     captureTiles.erase(
         std::remove_if(captureTiles.begin(), captureTiles.end(),
             [&](const glm::ivec2& tile) {
@@ -398,6 +394,7 @@ void BoardLogic::filterLegalMoves(Piece *piece) {
     );
 }
 
+// Check if the king is in check after a piece has moved
 bool BoardLogic::isKingInCheckAfterMove(Piece *piece, const glm::ivec2 &newPos) {
     // Save the original position
     glm::ivec2 originalPos = piece->gridPosition;
@@ -419,7 +416,7 @@ bool BoardLogic::isKingInCheckAfterMove(Piece *piece, const glm::ivec2 &newPos) 
     Piece* king = findKing(piece->pieceColor);
     bool inCheck = isKingInCheck(dynamic_cast<King*>(king));
 
-    // Revert the piece to its original position
+    // Move the piece back to its original position
     piece->gridPosition = originalPos;
 
     // Restore the captured piece if it was removed
@@ -594,8 +591,11 @@ std::vector<Piece*> BoardLogic::getBotPieces(PieceColor color) {
 }
 
 void BoardLogic::selectRandomMove(Piece* piece) {
+    // cheap checkmate check
+    // todo remove counter and keep track of bot tried pieces if all pieces are used, declare checkmate
     if (botMoveCounter >= 20) {
         std::cout << "Move limit reached. No legal bot moves available." << std::endl;
+        gameEnded = true;
         return;
     }
     // Clear the valid and capture tiles
@@ -628,22 +628,25 @@ void BoardLogic::selectRandomMove(Piece* piece) {
         makeMove(move.x, move.y);
         botMoveCounter = 0;
     } else {
-        makeBotMove();
         botMoveCounter += 1;
+        makeBotMove();
     }
 }
 
+// If single player is selected, this will make the opponent move
 void BoardLogic::makeBotMove() {
-    PieceColor botColor = BLACK; // Change to BLACK if the bot plays as black
-    std::vector<Piece*> botPieces = getBotPieces(botColor);
+    if (!gameEnded) {
+        PieceColor botColor = BLACK; // Change to WHITE if you want the bot to play as white
+        std::vector<Piece*> botPieces = getBotPieces(botColor);
 
-    if (!botPieces.empty()) {
-        // Select a random piece
-        int randomIndex = std::rand() % botPieces.size();
-        std::cout << randomIndex << std::endl;
-        Piece* randomPiece = botPieces[randomIndex];
-        selectRandomMove(randomPiece);
-    } else {
-        std::cout << "No bot pieces available, checkmate(?)" << std::endl;
+        if (!botPieces.empty()) {
+            // Select a random piece
+            int randomIndex = std::rand() % botPieces.size();
+            std::cout << randomIndex << std::endl;
+            Piece* randomPiece = botPieces[randomIndex];
+            selectRandomMove(randomPiece);
+        } else {
+            std::cout << "No bot pieces available, checkmate(?)" << std::endl;
+        }
     }
 }

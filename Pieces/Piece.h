@@ -34,7 +34,7 @@ public:
     static ObjModel *queenModel;
     static ObjModel *kingModel;
 
-    Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos, glm::vec3 pieceScaling
+    Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos
         , PieceType pieceType, PieceColor pieceColor);
 
     void remove();
@@ -46,7 +46,7 @@ public:
 
     static glm::vec3 gridToDrawPosition(int x, int z);
 
-    void moveTo(glm::ivec2 newPosition);
+    virtual void moveTo(glm::ivec2 newPosition);
     glm::vec3 directionToTarget(glm::vec3 target);
     float distanceToTarget(glm::vec3 target);
 

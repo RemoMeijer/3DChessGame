@@ -7,7 +7,7 @@
 #include <iostream>
 #include <glm/ext/matrix_transform.hpp>
 
-// Initialize static members
+// Initialize static pieces
 ObjModel* Piece::pawnModel = nullptr;
 ObjModel* Piece::rookModel = nullptr;
 ObjModel* Piece::knightModel = nullptr;
@@ -24,7 +24,7 @@ constexpr float animationSpeed = 6.5f;      // Speed of animation, higher >> qui
 constexpr glm::vec4 blackPieceColor = glm::vec4(0.2078f, 0.2235, 0.2078f, 1);
 constexpr glm::vec4 whitePieceColor = glm::vec4(1, 0.8921f, 0.6156f, 1);
 
-Piece::Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos, glm::vec3 pieceScaling, PieceType type, PieceColor pieceCol) {
+Piece::Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos, PieceType type, PieceColor pieceCol) {
     gph = graphics;
     objModel = model;
     drawnColor = pieceCol == WHITE ? whitePieceColor : blackPieceColor;
@@ -33,7 +33,7 @@ Piece::Piece(Graphics* graphics, ObjModel* model, glm::ivec2 pos, glm::vec3 piec
     moveToTarget = false;
     gridPosition = pos;
     position = gridToDrawPosition(gridPosition.x, gridPosition.y);
-    scale = pieceScaling;
+    scale = glm::vec3(0.2f); // Can be included if pieces need to be bigger or smaller, depending on type
 }
 
 // Draw a piece
@@ -55,7 +55,6 @@ void Piece::loadModels() {
     bishopModel = new ObjModel("Resources/Bishop/bishop.obj");
     queenModel = new ObjModel("Resources/Queen/queen.obj");
     kingModel = new ObjModel("Resources/King/king.obj");
-
 }
 
 void Piece::moveTo(glm::ivec2 newPosition) {
@@ -108,17 +107,17 @@ float Piece::distanceToTarget(glm::vec3 target)
 }
 
 void Piece::isPicked() {
-    position.y = 0.5f;
+    position.y = 0.5f; // Move piece a little bit up to make clear this one is being picked up
 }
 
 void Piece::isNotPicked() {
-    position.y = 0.0f;
+    position.y = 0.0f; // Move piece back down
 }
 
 void Piece::captured() {
-    position = glm::vec3(100, 0, 100);
-    gridPosition = glm::ivec2(100, 100);
-    moveToTarget = false;
+    position = glm::vec3(100, 0, 100); // Definition of narnia, could also be removed from drawable list, but this works fine
+    gridPosition = glm::ivec2(100, 100);  // Let it not interfere with the active game
+    moveToTarget = false; // Make it teleport, not animate
 }
 
 Piece::~Piece() { }

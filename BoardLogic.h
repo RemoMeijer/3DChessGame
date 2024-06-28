@@ -31,11 +31,11 @@ class BoardLogic {
 public:
     BoardLogic();
     void playSound(const std::string& filePath);
-    void AddPiece(Piece *piece);
+    virtual void AddPiece(Piece *piece);
 
     void makeMove(int x, int y);
     void selectPiece(int x, int y);
-    void changeTurn();
+    virtual void changeTurn();
 
     bool checkDirection(Piece* checkedPiece, int x, int y);
     void checkPawnMoves(Pawn* checkedPiece);
@@ -70,6 +70,7 @@ public:
     bool turnChanged;
     bool whiteTurn;
     bool singlePlayer;
+    bool gameEnded;
 
     sf::SoundBuffer buffer;
     sf::Sound sound;

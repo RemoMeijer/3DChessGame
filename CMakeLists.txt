@@ -33,3 +33,22 @@ add_executable(eindopdracht
 target_link_libraries(eindopdracht GLEW::GLEW glfw OpenGL::GL dl pthread X11 sfml-audio)
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${CMAKE_BINARY_DIR})
+
+
+# Tried to add unit tests, could not get it to work
+#include(FetchContent)
+#FetchContent_Declare(
+#        googletest
+#        URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+#)
+#FetchContent_MakeAvailable(googletest)
+#enable_testing()
+#
+#add_executable(BoardLogicTest
+#        Tests/BoardLogicTest.cpp
+#        BoardLogic.cpp
+#)
+#target_link_libraries(BoardLogicTest PRIVATE gtest_main)
+#
+#include(GoogleTest)
+#gtest_discover_tests(BoardLogicTest)

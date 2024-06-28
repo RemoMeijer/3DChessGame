@@ -34,7 +34,7 @@ public:
     Graphics();
     ~Graphics();
 
-    LegalSpacesBoard* legalSpacesBoard;
+    LegalSpacesBoard* legalSpacesBoard{};
 
     void mainLoop();
     void init();

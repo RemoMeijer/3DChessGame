@@ -5,7 +5,7 @@
 #include "Queen.h"
 
 Queen::Queen(Graphics *graphics, glm::ivec2 pos, PieceColor pieceColor)
-    : Piece(graphics, Piece::queenModel, pos, glm::vec3(0.2f), QUEEN, pieceColor) {
+    : Piece(graphics, Piece::queenModel, pos, QUEEN, pieceColor) {
 }
 
 Queen::~Queen() {

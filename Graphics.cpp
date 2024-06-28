@@ -2,14 +2,15 @@
 // Created by remo on 6/19/24.
 //
 #include "Graphics.h"
-
 #include "LegalSpacesBoard.h"
 
 using tigl::Vertex;
 
 std::list<Drawable *> drawables;
 auto boardlogic = new BoardLogic;
-int waitCounter = 0;
+int waitCounter = 0; // How long the camera should wait after a move
+glm::vec3 whiteCamPos = glm::vec3(-7.28f, -8.0f, -12.0f);
+glm::vec3 blackCamPos = glm::vec3(-7.28f, -8.0f, 2.0f);
 
 Graphics::Graphics() = default;
 
@@ -47,18 +48,18 @@ void Graphics::init() {
 
     // Create camera
     camera = new Camera();
-    camera->moveTo(glm::vec3(-7.28f, -8.0f, -12.0f), glm::vec3(45, 0, 0));
+    camera->moveTo(whiteCamPos, glm::vec3(45, 0, 0));
 
     glfwSetMouseButtonCallback(window, Graphics::handleMouseCallback);
 
     // Create board
     auto *board = new Board(new Texture("Resources/chessboard.png"));
-    board->position = glm::vec3(7.28f, 0, 5.0f);
-    board->scale = glm::vec3(5);
+    board->position = glm::vec3(7.28f, 0, 5.0f); // Board position
+    board->scale = glm::vec3(5); // Scale the bord
     drawables.push_back(board);
 
     // Create legal spaces board
-    legalSpacesBoard = new LegalSpacesBoard(8, 8, 0.6165f);
+    legalSpacesBoard = new LegalSpacesBoard(BOARD_WIDTH, BOARD_HEIGHT, 0.6165f);
     drawables.push_back(legalSpacesBoard);
 
 
@@ -71,6 +72,7 @@ void Graphics::init() {
     }
 }
 
+// This method tries to mimmick ray casting but failes enormously, so please ignore the messy code in here (It works in this case)
 void Graphics::handleMouseCallback(GLFWwindow *window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (boardlogic->singlePlayer && !boardlogic->whiteTurn) {
@@ -160,7 +162,7 @@ void Graphics::handleMouseCallback(GLFWwindow *window, int button, int action, i
         }
 
         // Boundary check
-        gridXint = (gridXint > 7) ? 7 : (gridXint < 0) ? 0 : gridXint;
+        gridXint = gridXint > 7 ? 7 : gridXint < 0 ? 0 : gridXint;
 
         Graphics::handleClickCoords(gridXint, gridYInt);
     }
@@ -313,9 +315,9 @@ void Graphics::update() {
         if (waitCounter > 80) {
             boardlogic->turnChanged = false;
             if (boardlogic->whiteTurn) {
-                camera->animateTo(glm::vec3(-7.28f, -8.0f, -12.0f), glm::vec3(45, 0, 0));
+                camera->animateTo(whiteCamPos, glm::vec3(45, 0, 0));
             } else {
-                camera->animateTo(glm::vec3(-7.28f, -8.0f, 2.0f), glm::vec3(45, 180, 0));
+                camera->animateTo(blackCamPos, glm::vec3(45, 180, 0));
             }
             waitCounter = 0;
         }
@@ -331,7 +333,7 @@ void Graphics::update() {
 }
 
 void Graphics::draw() {
-    glClearColor(0.0941f, 0.1451f, 0.5334f, 0.4f);
+    glClearColor(0.0941f, 0.1451f, 0.5334f, 0.4f); // Bg color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int viewport[4];
@@ -348,6 +350,7 @@ void Graphics::draw() {
     tigl::shader->enableColorMult(true);
     tigl::shader->enableLighting(true);
 
+    // lighting definitions
     tigl::shader->setLightPosition(0, glm::vec3(1.0f, 20.0f, 0.0f));
     tigl::shader->setLightAmbient(0, glm::vec3(0.2f, 0.2f, 0.2f));
     tigl::shader->setLightDiffuse(0, glm::vec3(0.8f, 0.8f, 0.8f));
