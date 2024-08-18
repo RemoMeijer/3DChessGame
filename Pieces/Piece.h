@@ -50,7 +50,13 @@ public:
     glm::vec3 directionToTarget(glm::vec3 target);
     float distanceToTarget(glm::vec3 target);
 
+    virtual std::vector<glm::ivec2> getValidMoves(const std::vector<Piece*>& boardState) = 0;
+    virtual std::vector<glm::ivec2> getCaptureMoves(const std::vector<Piece*>& boardState) = 0;
+
     virtual ~Piece();
+
+protected:
+    std::vector<glm::ivec2> checkDirection(const std::vector<Piece*>& boardState, int dx, int dy, bool captureOnly = false);
 };
 
 #endif

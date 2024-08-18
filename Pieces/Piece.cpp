@@ -121,3 +121,31 @@ void Piece::captured() {
 }
 
 Piece::~Piece() { }
+
+std::vector<glm::ivec2> Piece::checkDirection(const std::vector<Piece *> &boardState, int dx, int dy, bool captureOnly) {
+    std::vector<glm::ivec2> tiles;
+    int x = gridPosition.x + dx;
+    int y = gridPosition.y + dy;
+
+    while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+        auto it = std::find_if(boardState.begin(), boardState.end(), [&](Piece* piece) {
+            return piece->gridPosition == glm::ivec2(x, y);
+        });
+
+        if (it != boardState.end()) {
+            if ((*it)->pieceColor != pieceColor) {
+                tiles.emplace_back(x, y);
+            }
+            break; // Stop after finding a piece
+        }
+
+        if (!captureOnly) {
+            tiles.emplace_back(x, y);
+        }
+
+        x += dx;
+        y += dy;
+    }
+
+    return tiles;
+}
