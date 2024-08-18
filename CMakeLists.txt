@@ -8,12 +8,13 @@ find_package(SFML 2.5 COMPONENTS audio REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(eindopdracht
+# Define the library target
+add_library(eindopdracht_lib
         Board.cpp Board.h
         Drawable.cpp Drawable.h
         Camera.cpp Camera.h
         Graphics.cpp Graphics.h
-        main.cpp stb_image.h
+        stb_image.h
         Texture.cpp Texture.h
         tigl.cpp tigl.h
         ObjModel.cpp ObjModel.h
@@ -25,30 +26,32 @@ add_executable(eindopdracht
         Pieces/Knight.cpp Pieces/Knight.h
         Pieces/Queen.cpp Pieces/Queen.h
         Pieces/King.cpp Pieces/King.h
-        LegalSpacesBoard.cpp
-        LegalSpacesBoard.h
-        Tile.cpp
-        Tile.h
+        LegalSpacesBoard.cpp LegalSpacesBoard.h
+        Tile.cpp Tile.h
 )
-target_link_libraries(eindopdracht GLEW::GLEW glfw OpenGL::GL dl pthread X11 sfml-audio)
 
+target_link_libraries(eindopdracht_lib GLEW::GLEW glfw OpenGL::GL sfml-audio)
+
+# Define the main executable target
+add_executable(eindopdracht main.cpp)
+target_link_libraries(eindopdracht eindopdracht_lib)
+
+# Add Google Test
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/release-1.11.0.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+# Define the test executable target
+add_executable(test_eindopdracht test_main.cpp test_boardlogic.cpp)
+target_link_libraries(test_eindopdracht GTest::gtest_main eindopdracht_lib)
+
+include(GoogleTest)
+gtest_discover_tests(test_eindopdracht)
+
+# Copy resources to binary directory
 file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${CMAKE_BINARY_DIR})
-
-
-# Tried to add unit tests, could not get it to work
-#include(FetchContent)
-#FetchContent_Declare(
-#        googletest
-#        URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
-#)
-#FetchContent_MakeAvailable(googletest)
-#enable_testing()
-#
-#add_executable(BoardLogicTest
-#        Tests/BoardLogicTest.cpp
-#        BoardLogic.cpp
-#)
-#target_link_libraries(BoardLogicTest PRIVATE gtest_main)
-#
-#include(GoogleTest)
-#gtest_discover_tests(BoardLogicTest)

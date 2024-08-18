@@ -9,6 +9,7 @@
 #include <SFML/Audio.hpp>
 #include <algorithm>
 #include <iostream>
+#include <unordered_set>
 
 #include "Pieces/Bishop.h"
 #include "Pieces/King.h"
@@ -26,10 +27,11 @@ constexpr int BLACKPAWNSTARTPOS = 1;
 
 
 class BoardLogic {
-    Piece* selectedPiece;
 
 public:
+    Piece* selectedPiece;
     BoardLogic();
+    ~BoardLogic();
     void playSound(const std::string& filePath);
     virtual void AddPiece(Piece *piece);
 
@@ -65,6 +67,8 @@ public:
     std::vector<Piece*> boardState;
     std::vector<glm::ivec2> validTiles;
     std::vector<glm::ivec2> captureTiles;
+    std::unordered_set<Piece*> attemptedPieces;
+
 
     int currentState;
     bool turnChanged;
