@@ -11,6 +11,7 @@
 #include <iostream>
 #include <unordered_set>
 
+#include "ChessBot.h"
 #include "Pieces/Bishop.h"
 #include "Pieces/King.h"
 #include "Pieces/Knight.h"
@@ -30,6 +31,7 @@ class BoardLogic {
 
 public:
     Piece* selectedPiece;
+    ChessBot* chessBot;
     BoardLogic();
     ~BoardLogic();
     void playSound(const std::string& filePath);

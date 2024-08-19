@@ -5,14 +5,14 @@
 #include "BoardLogic.h"
 
 BoardLogic::BoardLogic() {
-    singlePlayer = false; // Bot on or off -> todo make clickable in game
+    singlePlayer = true; // Bot on or off -> todo make clickable in game
     whiteTurn = true; // White to start
     turnChanged = false; // Switch camera, or make the bot move
     selectedPiece = nullptr; // Piece that is picked-up
     currentState = SELECTING; // Start the game in the selecting state
     srand(time(nullptr)); // Seeding for some random moves
-    botMoveCounter = 0;
     gameEnded = false;
+    chessBot = new ChessBot(BLACK, this);
 }
 
 void BoardLogic::AddPiece(Piece *piece) {
@@ -22,6 +22,12 @@ void BoardLogic::AddPiece(Piece *piece) {
 void BoardLogic::changeTurn() {
     whiteTurn = !whiteTurn;
     turnChanged = true;
+}
+
+void BoardLogic::makeBotMove() {
+    if (singlePlayer && !whiteTurn) {
+        chessBot->makeMove();
+    }
 }
 
 void BoardLogic::playSound(const std::string &filePath) {
@@ -209,69 +215,6 @@ bool BoardLogic::isKingInCheckAfterMove(Piece *piece, const glm::ivec2 &newPos) 
     }
 
     return inCheck;
-}
-
-std::vector<Piece *> BoardLogic::getBotPieces(PieceColor color) {
-    std::vector<Piece *> botPieces;
-    for (Piece *piece: boardState) {
-        if (piece->pieceColor == color) {
-            botPieces.push_back(piece);
-        }
-    }
-    return botPieces;
-}
-
-void BoardLogic::selectRandomMove(Piece *piece) {
-    // Clear the valid and capture tiles
-    validTiles.clear();
-    captureTiles.clear();
-
-    selectedPiece = piece;
-
-    piece->getValidMoves(boardState);
-
-    // Filter out illegal moves
-    filterLegalMoves(selectedPiece);
-
-    // Combine valid moves and capture moves
-    std::vector<glm::ivec2> allMoves = validTiles;
-    allMoves.insert(allMoves.end(), captureTiles.begin(), captureTiles.end());
-
-    if (!allMoves.empty()) {
-        // Select a random move
-        int randomIndex = std::rand() % allMoves.size();
-        glm::ivec2 move = allMoves[randomIndex];
-        makeMove(move.x, move.y);
-        attemptedPieces.clear(); // Reset attempted pieces if a move was made
-    } else {
-        attemptedPieces.insert(piece); // Mark this piece as attempted
-        makeBotMove();
-    }
-}
-
-void BoardLogic::makeBotMove() {
-    if (!gameEnded) {
-        PieceColor botColor = BLACK; // Change to WHITE if you want the bot to play as white
-        std::vector<Piece *> botPieces = getBotPieces(botColor);
-
-        // Remove pieces that have already been attempted
-        botPieces.erase(std::remove_if(botPieces.begin(), botPieces.end(),
-                                       [this](Piece *piece) {
-                                           return attemptedPieces.find(piece) != attemptedPieces.end();
-                                       }),
-                        botPieces.end());
-
-
-        if (!botPieces.empty()) {
-            // Select a random piece from remaining ones
-            int randomIndex = std::rand() % botPieces.size();
-            Piece *randomPiece = botPieces[randomIndex];
-            selectRandomMove(randomPiece);
-        } else {
-            std::cout << "No legal bot moves available. Checkmate or stalemate." << std::endl;
-            gameEnded = true;
-        }
-    }
 }
 
 BoardLogic::~BoardLogic() {

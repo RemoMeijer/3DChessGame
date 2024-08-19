@@ -288,6 +288,7 @@ void Graphics::update() {
     timeLastFrame = currentTime;
 
     if (boardlogic->singlePlayer && !boardlogic->whiteTurn) {
+        // Wait 80 frames before making a move
         if (waitCounter > 80) {
             boardlogic->makeBotMove();
             waitCounter = 0;
